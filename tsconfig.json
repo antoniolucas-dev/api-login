@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "es2016",
+    "module": "commonjs",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true,
+    
+    // Certifique-se de ter esta linha apontando para os tipos da aplicação:
+    "typeRoots": ["./node_modules/@types", "./src/types"]
+  },
+  // Certifique-se de que a pasta src está incluída no projeto:
+  "include": ["src/**/*"]
+}

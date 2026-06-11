@@ -1,0 +1,25 @@
+{
+  "name": "app-tarefas-auth",
+  "version": "1.0.0",
+  "description": "Lista de Tarefas com Login — Prática Aula 33",
+  "scripts": {
+    "dev": "ts-node-dev --respawn src/app.ts"
+  },
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "connect-flash": "^0.1.1",
+    "ejs": "^3.1.9",
+    "express": "^4.18.2",
+    "express-session": "^1.19.0"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
+    "@types/connect-flash": "^0.0.40",
+    "@types/ejs": "^3.1.5",
+    "@types/express": "^4.17.21",
+    "@types/express-session": "^1.19.0",
+    "@types/node": "^20.10.0",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.3.3"
+  }
+}
