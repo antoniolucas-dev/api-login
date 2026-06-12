@@ -1,47 +1,45 @@
-import { Router, Request, Response, NextFunction } from 'express';
-import { tarefasDB, Tarefa } from '../models/tarefaModel';
+import { Router, Request, Response } from 'express';
+import { tarefasDB } from '../models/tarefaModel';
+import { requireAuth } from '../midd/authMiddleware';
+import { Role } from '../models/userModel';
 
 const router = Router();
 
-// Função que impede pessoas não logadas de ver as tarefas
-export function garantirAutenticacao(req: Request, res: Response, next: NextFunction) {
-  const sessao = req.session as any;
-  if (sessao && sessao.userId) {
-    return next();
-  }
-  req.flash('error_msg', 'Por favor, faça login para ver as tarefas.');
-  res.redirect('/login');
-}
+// Protege todas as rotas de tarefas usando o middleware requireAuth
+router.use(requireAuth);
 
-// Aplica a proteção em todas as rotas abaixo
-router.use(garantirAutenticacao);
-
-// Lista apenas as tarefas criadas pelo ID do usuário logado
 router.get('/', (req: Request, res: Response) => {
   const sessao = req.session as any;
-  const tarefasFiltradas = tarefasDB.filter(t => t.userId === sessao.userId);
-  res.render('tarefas', { tarefas: tarefasFiltradas });
+  
+  let tarefasFiltradas;
+
+  // REGRA: Se for ADMIN, vê TUDO. Se for USER, vê apenas as suas tarefas.
+  if (sessao.userRole === Role.ADMIN) {
+    tarefasFiltradas = tarefasDB;
+  } else {
+    tarefasFiltradas = tarefasDB.filter(t => t.userId === sessao.userId);
+  }
+
+  res.render('tarefas', { tarefas: tarefasFiltradas, userRole: sessao.userRole });
 });
 
-// Cria uma nova tarefa associada ao usuário
 router.post('/nova', (req: Request, res: Response) => {
   const { titulo } = req.body;
   const sessao = req.session as any;
 
   if (!titulo || titulo.trim() === '') {
-    req.flash('error_msg', 'Escreva algo para adicionar a tarefa!');
+    req.flash('error_msg', 'Preencha o título da tarefa.');
     return res.redirect('/tarefas');
   }
 
-  const novaTarefa: Tarefa = {
+  tarefasDB.push({
     id: Date.now().toString(),
     userId: sessao.userId,
     titulo: titulo.trim(),
     concluida: false
-  };
+  });
 
-  tarefasDB.push(novaTarefa);
-  req.flash('success_msg', 'Tarefa adicionada com sucesso!');
+  req.flash('success_msg', 'Tarefa adicionada!');
   res.redirect('/tarefas');
 });
 

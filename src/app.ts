@@ -4,6 +4,7 @@ import flash from 'connect-flash';
 import path from 'path';
 import authRoutes from './routes/authRoutes';
 import tarefaRoutes from './routes/tarefaRoutes';
+import adminRoutes from './routes/adminRoutes'; // Novo arquivo de rotas do administrador
 
 const app = express();
 
@@ -11,47 +12,57 @@ const app = express();
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-// Mapeia pastas de arquivos estáticos (CSS, imagens) se houver
+// Mapeamento de ficheiros estáticos (CSS, Imagens, JS do lado do cliente)
 app.use(express.static(path.join(__dirname, '../public')));
 
-// Configurações cruciais para ler dados enviados pelos formulários HTML
+// Middlewares cruciais para capturar e ler os dados dos formulários HTML (POST)
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// Configuração do gerenciamento de sessões
+// Configuração do express-session para gerir o estado de login
 app.use(
   session({
-    secret: 'chave_secreta_tarefas_123',
+    secret: 'chave_secreta_guards_tarefas_9876',
     resave: false,
     saveUninitialized: false,
-    cookie: { maxAge: 1000 * 60 * 60 * 24 } // Mantém logado por 1 dia
+    cookie: { maxAge: 1000 * 60 * 60 * 24 } // Mantém a sessão ativa por 1 dia
   })
 );
 
-// Ativa as mensagens de feedback (Flash)
+// Ativação das mensagens de feedback temporárias (Flash)
 app.use(flash());
 
-// Middleware Global: passa os dados para dentro de todas as telas (.ejs) automaticamente
+// Middleware Global: Injeta mensagens flash e dados do utilizador autenticado em todas as Views (.ejs)
 app.use((req, res, next) => {
-  const sessao = req.session as any;
+  // Com o arquivo src/types/session.d.ts configurado, não precisará do 'as any'
+  const sessao = req.session as any; 
+
   res.locals.success_msg = req.flash('success_msg');
   res.locals.error_msg = req.flash('error_msg');
-  res.locals.user = sessao.userId ? { id: sessao.userId, name: sessao.userName } : null;
+  
+  // Disponibiliza as informações do utilizador e da sua Role para o EJS decidir o que renderizar
+  res.locals.user = sessao.userId ? { 
+    id: sessao.userId, 
+    name: sessao.userName, 
+    role: sessao.userRole 
+  } : null;
+  
   next();
 });
 
-// Vincula os arquivos de rotas do sistema
+// Associação e registo das rotas da aplicação
 app.use('/', authRoutes);
 app.use('/tarefas', tarefaRoutes);
+app.use('/admin', adminRoutes); // Conecta o painel administrativo à rota /admin
 
-// RESOLVE O "Cannot GET /": Se acessar a raiz, joga direto para o login
+// Redirecionamento automático da rota raiz para a página de login
 app.get('/', (req, res) => {
   res.redirect('/login');
 });
 
 const PORT = 3000;
 app.listen(PORT, () => {
-  console.log(`Servidor rodando perfeitamente em http://localhost:${PORT}`);
+  console.log(`Servidor iniciado com sucesso em http://localhost:${PORT}`);
 });
 
 export default app;

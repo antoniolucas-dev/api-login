@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Painel Administrativo</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #eef2f3; margin: 0; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        h1 { color: #2c3e50; margin: 0; }
+        .btn { padding: 8px 16px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 14px; }
+        .btn-back { background: #34495e; color: white; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background-color: #f4f6f7; color: #34495e; }
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; }
+        .badge-admin { background-color: #e74c3c; color: white; }
+        .badge-user { background-color: #3498db; color: white; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🛡️ Painel do Administrador</h1>
+            <a href="/tarefas" class="btn btn-back">Voltar para Tarefas</a>
+        </div>
+        
+        <h3>Usuários Cadastrados no Sistema</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>E-mail</th>
+                    <th>Nível de Acesso (Role)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% usuarios.forEach(function(usuario) { %>
+                    <tr>
+                        <td><%= usuario.id %></td>
+                        <td><%= usuario.nome %></td>
+                        <td><%= usuario.email %></td>
+                        <td>
+                            <span class="badge <%= usuario.role === 'ADMIN' ? 'badge-admin' : 'badge-user' %>">
+                                <%= usuario.role %>
+                            </span>
+                        </td>
+                    </tr>
+                <% }); %>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
